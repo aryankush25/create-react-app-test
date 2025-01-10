@@ -1,5 +1,14 @@
 import "./App.css";
-import { createContext, Fragment, useContext, useReducer } from "react";
+import {
+  createContext,
+  forwardRef,
+  Fragment,
+  useContext,
+  useEffect,
+  useImperativeHandle,
+  useReducer,
+  useRef,
+} from "react";
 
 const CounterContext = createContext();
 
@@ -19,12 +28,20 @@ const reducer = (state, action) => {
   }
 };
 
-const Comp = () => {
+const Comp = forwardRef((props, ref) => {
   const { state, dispatch } = useContext(CounterContext);
+
+  useImperativeHandle(ref, () => {
+    return {
+      print() {
+        console.log(ref.current);
+      },
+    };
+  });
 
   return (
     <Fragment>
-      <div>
+      <div ref={ref}>
         <p>Count: {state.count}</p>
         <button onClick={() => dispatch({ type: "increment" })}>
           Increment
@@ -35,14 +52,21 @@ const Comp = () => {
       </div>
     </Fragment>
   );
-};
+});
 
 function App() {
   const [state, dispatch] = useReducer(reducer, initialState);
+  const ref = useRef();
+
+  useEffect(() => {
+    ref.current.print();
+
+    console.log(ref.current);
+  }, []);
 
   return (
     <CounterContext.Provider value={{ state, dispatch }}>
-      <Comp />
+      <Comp ref={ref} />
     </CounterContext.Provider>
   );
 }
