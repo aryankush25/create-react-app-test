@@ -1,5 +1,7 @@
 import "./App.css";
-import { Fragment, useReducer } from "react";
+import { createContext, Fragment, useContext, useReducer } from "react";
+
+const CounterContext = createContext();
 
 const initialState = { count: 1 };
 
@@ -17,9 +19,8 @@ const reducer = (state, action) => {
   }
 };
 
-function App() {
-  const [state, dispatch] = useReducer(reducer, initialState);
-  const [state1, dispatch1] = useReducer(reducer, initialState);
+const Comp = () => {
+  const { state, dispatch } = useContext(CounterContext);
 
   return (
     <Fragment>
@@ -32,16 +33,17 @@ function App() {
           Decrement
         </button>
       </div>
-      <div>
-        <p>Count1: {state1.count}</p>
-        <button onClick={() => dispatch1({ type: "increment" })}>
-          Increment
-        </button>
-        <button onClick={() => dispatch1({ type: "decrement" })}>
-          Decrement
-        </button>
-      </div>
     </Fragment>
+  );
+};
+
+function App() {
+  const [state, dispatch] = useReducer(reducer, initialState);
+
+  return (
+    <CounterContext.Provider value={{ state, dispatch }}>
+      <Comp />
+    </CounterContext.Provider>
   );
 }
 
